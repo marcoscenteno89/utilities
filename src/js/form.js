@@ -1,3 +1,5 @@
+import { msgError, msgSuccess } from './utilities.js';
+import Loader from './loader.js';
 export default class Form {
   // TO-DO add functionality so the form will only submit the action
   // TO-DO Generate steps, previous, next, status, and controller elements dynamically
@@ -11,7 +13,7 @@ export default class Form {
     this.values = {}
     this.currentTab = 0;
     this.previousTab;
-    this.controller = form.querySelector('.controller');
+    this.controller = form.querySelector('.controller > .group');
     this.next = form.querySelector('button[name="next"]');
     this.previous = form.querySelector('button[name="prev"]');
     this.loader = new Loader(this.next, 3);
@@ -21,7 +23,6 @@ export default class Form {
   init() {
     let tabListNode = this.form.querySelectorAll(".tab");
     this.next.setAttribute('data-text', this.next.innerHTML);
-
     tabListNode.forEach( (tab, i) => {
       let name = tab.getAttribute('data-name');
       tab.id = `id-${name.toLowerCase().replace(' ', '-')}`;
@@ -43,8 +44,8 @@ export default class Form {
     });
 
     
-    for (i of this.controller.children) {
-      i.style.width = `${100 / controllerChildren.length}%`;
+    for (let i of this.controller.children) {
+      i.style.width = `${100 / this.controller.children.length}%`;
     }
 
     // SETUP EVENT LISTENERS
@@ -56,8 +57,6 @@ export default class Form {
     this.next.addEventListener('click', (event) => this.changeTab(event));
     if (this.previous) {
       this.previous.addEventListener('click', (event) => this.changeTab(event));
-      // this.previous.style.width = '50%';
-      // this.next.style.width = '50%';
     }
     this.showNewTab(this.currentTab);
   }

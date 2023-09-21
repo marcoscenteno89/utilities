@@ -12,7 +12,7 @@ module.exports = {
   },
   watchOptions: {
     ignored: /node_modules/,
-    poll: 1000,
+    // poll: 1000,
   },
   module: {
     rules: [
@@ -41,14 +41,14 @@ module.exports = {
     ]
   },
   plugins: [
-    new BrowserSyncPlugin({
-      host: 'localhost',
-      port: 3000,
-      files: ['./public/*.html'],
-      server: { 
-        baseDir: ['public'] 
-      }
-    }),
+    // new BrowserSyncPlugin({
+    //   host: 'localhost',
+    //   port: 3000,
+    //   files: ['./public/*.html'],
+    //   server: { 
+    //     baseDir: ['public'] 
+    //   }
+    // }),
     new HtmlWebpackPlugin({
       template: 'src/templates/index.html',
       filename: 'index.html',
@@ -58,9 +58,5 @@ module.exports = {
       path: path.join(__dirname, 'src/templates/form.html'), 
       location: 'body'
     }),
-    new HtmlWebpackPartialsPlugin({
-      path: path.join(__dirname, 'src/templates/login.html'), 
-      location: 'body'
-    })
   ],
 };

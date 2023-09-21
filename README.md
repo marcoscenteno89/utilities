@@ -8,39 +8,21 @@
 #### Limiter class (disables certain element after event hits a limit)
 
 ### Multi-step form
+
+Form class will generate a multi-step form. If no multi-step needed, simply run a form with one tab.
+The class takes 3 parameters
+1. Form element
 ``` html
 <form action="sales-entry" class="step-form" id="contact-info">
   <div class="steps"></div>
-  <div class="tab" data-name="Contact">
-    <input type="hidden" class="form-input" name="lat">
-    <input required type="text" class="form-input" name="first_name" placeholder="First Name">
-    <input type="text" class="form-input" name="last_name" placeholder="Last Name">
-    <input required type="email" class="form-input" name="email" placeholder="Email">
-    <input required type="tel" class="form-input" name="phone" placeholder="Phone Number">
+  <div class="tab" data-name="Tab 1">
+    <input type="text" class="form-input" name="field_1" placeholder="Field #1">
   </div>
-  <div class="tab" data-name="Address">
-    <input type="hidden" class="form-input" name="lat">
-    <input required type="text" class="form-input" name="line1" placeholder="Address">
-    <input type="text" class="form-input" name="line2" placeholder="Address Line 2">
-    <input required type="text" class="form-input" name="city" placeholder="City">
-    <input required type="text" class="form-input" name="state" placeholder="State">
-    <input required type="text" class="form-input" name="postal_code" placeholder="Zip Code">
+  <div class="tab" data-name="Tab 2">
+    <input type="text" class="form-input" name="field_2" placeholder="Field #2">
   </div>
-  <div class="tab" data-name="Message">
-    <select required class="form-input" name="languages">
-      <option value="en" selected>English</option>
-      <option value="fr">French</option>
-      <option value="es">Spanish</option>
-      <option value="de">German</option>
-    </select>
-    <textarea 
-      class="form-input"
-      required 
-      name="message" 
-      placeholder="Enter your comments here..." 
-      rows="5" 
-      cols="50">
-    </textarea>
+  <div class="tab" data-name="Tab 3">
+    <input required type="text" class="form-input" name="field_3" placeholder="Field #3">
   </div>
   <div class="controller">
     <div class="status"></div>
@@ -51,6 +33,26 @@
     </div>
   </div>
 </form>
+```
+2. Tab change callback function
+``` js
+// Callback will run whenver a tab changes, (does not run when going back)
+const contactInfoChangeTabCallback = (form, val) => {
+  return new Promise( async (resolve) => {
+    console.log(val);
+    resolve(true);
+  });
+}
+```
+3. Form submition callback function
+``` js
+// Callback function will run when last step is submitted
+const contactInfoFormCallback = (form, val) => {
+  return new Promise( async (resolve) => {
+    console.log(val);
+    resolve(true);
+  });
+}
 ```
 
 ## Available Scripts

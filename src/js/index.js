@@ -1,28 +1,40 @@
 import { msgError, msgSuccess } from './utilities.js';
+import Form from './form.js';
+import Limiter from './limiter.js';
 import '../css/form.css';
 import { startCase } from 'lodash';
 
-const formCallback = (form, val) => {
-  // let limiter = new Limiter(form.next, form.status);
-  // if (limiter.disabled) return false; // FORM HAS BEEN DISABLED
+const limiterCallback = (form, val) => {
+  // Limiter requires 2 parameters
+  // 1. Element to disable
+  // 2. Element to display current status
+  let limiter = new Limiter(form.next, form.status);
+  // Form submit button has been disabled
+  if (limiter.disabled) return false; 
   return new Promise( async (resolve) => {
-    console.log(status);
-    let msgE = `4
-      We could not find your address or you are located outside of our active service area.
-    `;
-    let stat = form.status;
-    if (status.error) {
-      stat.innerHTML = msgError(status.detail);
-    } else {
-      let res = status.result
-      if (res.length > 0) {
-        stat.innerHTML = msgSuccess(startCase(res[0].properties.Status));
-      } else {
-        stat.innerHTML = msgError(msgE);
-      }
-    }
-    resolve('data from form');
+    limiter.add();
+    console.log(val);
+    resolve(true);
   });
 }
-const checkAddressForm = document.querySelector('.check-address');
-const checkAddress = new Form(checkAddressForm);
+const limiterForm = document.querySelector('#limiter');
+const limiter = new Form(limiterForm, limiterCallback);
+
+// Callback function will run when last step is submitted
+const contactInfoFormCallback = (form, val) => {
+  return new Promise( async (resolve) => {
+    console.log(val);
+    resolve(true);
+  });
+}
+
+// Callback will run whenver a tab changes, (does not run when going back)
+const contactInfoChangeTabCallback = (form, val) => {
+  return new Promise( async (resolve) => {
+    console.log(val);
+    resolve(true);
+  });
+}
+
+const contactInfoForm = document.querySelector('#contact-info');
+const contactInfo = new Form(contactInfoForm, contactInfoFormCallback);

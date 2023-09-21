@@ -1,3 +1,4 @@
+import { msgError, msgSuccess, storageAvailable } from './utilities.js';
 export default class Limiter {
   constructor(elem, status) {
     this.target = elem;
@@ -17,36 +18,36 @@ export default class Limiter {
   }
 
   init() {
-    if (storageAvailable('localStorage')) {
+    if (storageAvailable()) {
       let jsonData = localStorage.getItem(`agile_${this.target.getAttribute('data-limit-id')}`);
       if (jsonData) { // USE EXISTING DATA 
         this.dataExists(JSON.parse(jsonData));
       } else { // NO DATA AVAILABLE, CREATE NEW ENTRY
         this.resetLimit();
       }
+      if (this.now > this.expiration) {
+        this.resetLimit();
+      }
       if (this.disabled) {
-        if (this.now > this.expiration) {
-          this.resetLimit();
-        } else {
           this.currentlyDisabled();
           return false;
-        }
       }
       if (this.count >= this.countLimit) {
         this.disableTarget();
         this.currentlyDisabled();
         return false;
-      } else {
-        this.count = this.count + 1;
       }
-      let label = this.id.replace('_', ' ');
-      console.log(`You can try ${label} ${this.countLimit - this.count} more times.`);
       this.save();
-    } else {
-      console.log('localStorage not available');
     }
   }
 
+  add() {
+    this.count = this.count + 1;
+    let label = this.id.replace('_', ' ');
+    console.log(`You can try ${label} ${this.countLimit - this.count} more times.`);
+    this.setExpiration();
+    this.save();
+  }
   dataExists(data) {
     this.count = data.count;
     this.disabled = data.disabled;
@@ -61,11 +62,13 @@ export default class Limiter {
     }));
   }
 
-  disableTarget() {
+  setExpiration() {
     this.expiration = new Date();
     if (this.min > 0) this.expiration.setMinutes( this.now.getMinutes() + this.min );
     if (this.hr > 0) this.expiration.setHours( this.now.getHours() + this.hr);
     if (this.day > 0) this.expiration.setHours( this.now.getHours() + (this.day * 24));
+  }
+  disableTarget() {
     this.target.disabled = true;
     this.disabled = true
   }

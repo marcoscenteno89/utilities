@@ -31,4 +31,16 @@ const ajax = (api, callback=false) => {
   });
 }
 
-export { exists, ajax, msgError, msgSuccess }
+const storageAvailable = () => {
+  try {
+    const testKey = 'test';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch(e) {
+    console.log('localStorage not available');
+    return false;
+  }
+}
+
+export { exists, ajax, msgError, msgSuccess, storageAvailable }
