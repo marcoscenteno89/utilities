@@ -11,6 +11,7 @@ export default class Form {
     this.values = {}
     this.currentTab = 0;
     this.previousTab;
+    this.controller = form.querySelector('.controller');
     this.next = form.querySelector('button[name="next"]');
     this.previous = form.querySelector('button[name="prev"]');
     this.loader = new Loader(this.next, 3);
@@ -20,7 +21,6 @@ export default class Form {
   init() {
     let tabListNode = this.form.querySelectorAll(".tab");
     this.next.setAttribute('data-text', this.next.innerHTML);
-
 
     tabListNode.forEach( (tab, i) => {
       let name = tab.getAttribute('data-name');
@@ -41,6 +41,12 @@ export default class Form {
         </div>
       `);
     });
+
+    
+    for (i of this.controller.children) {
+      i.style.width = `${100 / controllerChildren.length}%`;
+    }
+
     // SETUP EVENT LISTENERS
     this.form.querySelectorAll('.step').forEach((step, i) => {
       this.tabList[i].step = step;
@@ -50,8 +56,8 @@ export default class Form {
     this.next.addEventListener('click', (event) => this.changeTab(event));
     if (this.previous) {
       this.previous.addEventListener('click', (event) => this.changeTab(event));
-      this.previous.style.width = '50%';
-      this.next.style.width = '50%';
+      // this.previous.style.width = '50%';
+      // this.next.style.width = '50%';
     }
     this.showNewTab(this.currentTab);
   }
