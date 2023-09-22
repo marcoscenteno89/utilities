@@ -25,15 +25,9 @@ export default class Form {
     let tabListNode = this.form.querySelectorAll(".tab");
     this.next.setAttribute('data-text', this.next.innerHTML);
     tabListNode.forEach( (tab, i) => {
+      let step = false;
       let name = tab.getAttribute('data-name');
       tab.id = `id-${name.toLowerCase().replace(' ', '-')}`;
-      this.tabList.push({
-        valid: true,
-        index: i,
-        name: name,
-        tab: tab,
-        values: {}
-      });
 
       if (this.stepContainer) {
         let width = `style="flex: 0 1 ${100 / tabListNode.length}%;"`;
@@ -44,7 +38,17 @@ export default class Form {
             <span class="title">${name.toUpperCase()}</span>
           </div>
         `);
+        step = this.stepContainer.querySelector(`.step-${i}`);
       }
+
+      this.tabList.push({
+        valid: true,
+        index: i,
+        name: name,
+        tab: tab,
+        step: step,
+        values: {}
+      });
     });
 
     
@@ -88,11 +92,20 @@ export default class Form {
         }
       }
     });
+    if (this.tabList[this.currentTab].step) {
+      this.tabList[this.currentTab].step.classList.remove('error');
+    }
+
     if (issues > 0) {
+      console.log(this.tabList[this.currentTab].tab)
       this.tabList[this.currentTab].valid = false;
+      if (this.tabList[this.currentTab].step) {
+        this.tabList[this.currentTab].step.classList.add('error');
+      }
       this.status.innerHTML = msgError(msg);
       return false;
     }
+
     fieldList.forEach(field => {
       this.values[field.name] = field.value;
       this.tabList[this.currentTab].values[field.name] = field.value;

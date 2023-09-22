@@ -18,7 +18,7 @@ const limiterCallback = (form, val) => {
   });
 }
 const limiterForm = document.querySelector('#limiter');
-const limiter = new Form(limiterForm, limiterCallback);
+const limiter = new Form(limiterForm, limiterCallback, false);
 
 // Callback function will run when last step is submitted
 const contactInfoFormCallback = (form, val) => {
@@ -37,4 +37,4 @@ const contactInfoChangeTabCallback = (form, val) => {
 }
 
 const contactInfoForm = document.querySelector('#contact-info');
-const contactInfo = new Form(contactInfoForm, contactInfoFormCallback);
+const contactInfo = new Form(contactInfoForm, contactInfoFormCallback, contactInfoChangeTabCallback);
