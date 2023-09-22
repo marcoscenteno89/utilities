@@ -10,8 +10,18 @@
 ### Multi-step form
 
 Form class will generate a multi-step form. If no multi-step needed, simply run a form with one tab.
-The class takes 3 parameters
-1. Form element
+The class takes 3 parameters, 
+1. Form element (required)
+  - Form must contain these html elements
+  ``` html
+  <div class="steps"></div>
+  <div class="tab" data-name="Tab 1"></div>
+  <div class="status"></div>
+  <div class="controller"></div>
+  ```
+  - input elements must go inside the .tab element & form will only recognize input fields with the class .form-input, .next button is required, prev is only required if multiple tabs. User can also add custom buttons or links in the controller area, they must have the .btn class. 
+
+
 ``` html
 <form action="sales-entry" class="step-form" id="contact-info">
   <div class="steps"></div>
@@ -24,17 +34,17 @@ The class takes 3 parameters
   <div class="tab" data-name="Tab 3">
     <input required type="text" class="form-input" name="field_3" placeholder="Field #3">
   </div>
+  <div class="status"></div>
   <div class="controller">
-    <div class="status"></div>
-    <div class="group">
-      <button name="prev" type="button" class="btn">Go Back</button>
-      <a href="https://google.com" class="btn">Custom button</a>
-      <button name="next" type="button" class="btn">Check Now</button>
-    </div>
+    <!-- Insert your custom buttons or links here -->
+    <button name="prev" type="button" class="btn">Go Back</button>
+    <a href="https://google.com" class="btn">Custom button</a>
+    <button name="next" type="button" class="btn">Check Now</button>
   </div>
 </form>
 ```
-2. Tab change callback function
+2. Tab change callback function (optional)
+  If callback is not passed, form will pass values to value object and move on to next tab.
 ``` js
 // Callback will run whenver a tab changes, (does not run when going back)
 const contactInfoChangeTabCallback = (form, val) => {
@@ -44,7 +54,8 @@ const contactInfoChangeTabCallback = (form, val) => {
   });
 }
 ```
-3. Form submition callback function
+3. Form submition callback function (optional)
+  If callback is not passed, form will default to form action, if the action is a different url, user must use a protocol (https & http).
 ``` js
 // Callback function will run when last step is submitted
 const contactInfoFormCallback = (form, val) => {

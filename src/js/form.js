@@ -13,10 +13,11 @@ export default class Form {
     this.values = {}
     this.currentTab = 0;
     this.previousTab;
-    this.controller = form.querySelector('.controller > .group');
+    this.controller = form.querySelector('.controller');
     this.next = form.querySelector('button[name="next"]');
     this.previous = form.querySelector('button[name="prev"]');
     this.loader = new Loader(this.next, 3);
+    this.stepContainer = form.querySelector('.steps');
 
     this.init();
   }
@@ -33,14 +34,17 @@ export default class Form {
         tab: tab,
         values: {}
       });
-      let width = `style="flex: 0 1 ${100 / tabListNode.length}%;"`;
-      let step = tabListNode.length > 1 ? `${(i + 1)}.` : '';
-      this.form.querySelector('.steps').insertAdjacentHTML("beforeend", `
-        <div ${width} class="step step-${i} flex-col" data-step="${i}">
-          <span class="number">${step}</span>
-          <span class="title">${name.toUpperCase()}</span>
-        </div>
-      `);
+
+      if (this.stepContainer) {
+        let width = `style="flex: 0 1 ${100 / tabListNode.length}%;"`;
+        let step = tabListNode.length > 1 ? `${(i + 1)}.` : '';
+        this.stepContainer.insertAdjacentHTML("beforeend", `
+          <div ${width} class="step step-${i} flex-col" data-step="${i}">
+            <span class="number">${step}</span>
+            <span class="title">${name.toUpperCase()}</span>
+          </div>
+        `);
+      }
     });
 
     
