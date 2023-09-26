@@ -62,6 +62,12 @@
 }
 
 /* FORM STYLES */
+.step-form {
+  container-type: inline-size;
+  padding: 0.5rem;
+  background-color: #fff;
+  margin: 1rem 0;
+}
 .step-form > :not(:last-child) {
   width: 100%;
   margin-bottom: 0.5rem;
@@ -71,7 +77,6 @@
 }
 .step-form .btn {
   position: relative;
-  border-radius: var(--border-radius);
   border: none;
   color: var(--light);
   background-color: var(--primary);
@@ -98,8 +103,6 @@
   border-radius: var(--border-radius);
   border: solid 1px var(--dark);
 }
-
-/* MULTI-STEP FORMS STYLES */
 .step-form .tab {   
   display: none;
   flex-direction: column;
@@ -113,11 +116,6 @@
 .step-form .step.error:before {
   border-left: 0.8rem solid var(--error) !important;
 }
-.step-form .steps .step.active {
-  background-color: var(--light);
-  font-weight: 900;
-  z-index: 1;
-}
 .step-form .steps {
   display: flex;
   justify-content: space-between;
@@ -125,10 +123,12 @@
   overflow: hidden;
   padding: 0;
   height: 4rem;
-  position: sticky;
-  top: 5px;
   background-color: var(--light);
   box-shadow: 0 0 5px var(--dark);
+}
+.step-form .steps .step.active {
+  background-color: var(--light);
+  font-weight: 900;
   z-index: 1;
 }
 .step-form .steps .step {
@@ -181,27 +181,32 @@
   border-right: 0.8rem solid var(--primary);
 }
 .step-form .controller {
-  position: relative;
   display: flex;
-  align-items: stretch;
 }
 .step-form .controller > :not(:last-child) {
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .step-form .controller > :not(:first-child) {
   margin-left: -1px;
-  border-top-left-radius: 0 !important;
-  border-bottom-left-radius: 0 !important;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 @container (width < 430px) {
-  .step-form .title {
+  .step-form .title, .step-form .dot {
     display: none;
+  }
+  .step-form .controller {
+    flex-direction: column;
   }
   .step-form .btn {
     width: 100% !important;
     border-radius: var(--border-radius) !important;
+  }
+  .step-form .controller > :not(:last-child) {
+    margin-left: 0;
+    margin-bottom: 3px;
   }
 }
 @keyframes rotate {

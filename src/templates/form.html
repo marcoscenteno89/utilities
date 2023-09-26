@@ -19,24 +19,42 @@
   </div>
 </form>
 
-<form action="/" class="step-form" id="contact-info">
-  <div class="steps"></div>
-  <div class="tab" data-name="Tab 1">
-    <input required type="text" class="form-input" name="field_1" placeholder="Field #1">
-    <input type="text" class="form-input" name="field_1b" placeholder="Field #1b">
+<div class="row py-5">
+  <div class="col-5 mx-auto bg-dark p-5">
+    <h2 class="text-light">Contact Us Form</h2>
+    <form action="/" class="step-form" id="contact-info">
+      <div class="steps"></div>
+      <div class="tab" data-name="Contact Info">
+        <input required type="text" class="form-input" name="first_name" placeholder="First Name">
+        <input type="text" class="form-input" name="last_name" placeholder="Last Name">
+        <input required type="email" class="form-input" name="email" placeholder="Email">
+        <input required type="tel" class="form-input" name="phone" placeholder="Phone">
+      </div>
+      <div class="tab" data-name="Address">
+        <input type="text" class="form-input" name="address" placeholder="Address">
+        <input type="text" class="form-input" name="city" placeholder="City">
+        <input type="text" class="form-input" name="state" placeholder="State">
+        <input type="text" class="form-input" name="zip_code" placeholder="Zip Code">
+      </div>
+      <div class="tab" data-name="Random Info">
+        <input required type="text" class="form-input" name="profession" placeholder="Profession">
+        <input required type="number" class="form-input" name="age" placeholder="Age">
+        <select required class="form-input" name="gender" placeholder="Gender">
+          <option value="">Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div class="status"></div>
+      <div class="controller">
+        <button name="prev" type="button" class="btn">Go Back</button>
+        <a href="https://google.com" class="btn">Custom button</a>
+        <button name="next" type="button" class="btn">Continue</button>
+      </div>
+    </form>
   </div>
-  <div class="tab" data-name="Tab 2">
-    <input type="text" class="form-input" name="field_2" placeholder="Field #2">
-    <input type="text" class="form-input" name="field_2b" placeholder="Field #2b">
-  </div>
-  <div class="tab" data-name="Tab 3">
-    <input required type="text" class="form-input" name="field_3" placeholder="Field #3">
-    <input required type="text" class="form-input" name="field_3b" placeholder="Field #3b">
-  </div>
-  <div class="status"></div>
-  <div class="controller">
-    <button name="prev" type="button" class="btn">Go Back</button>
-    <a href="https://google.com" class="btn">Custom button</a>
-    <button name="next" type="button" class="btn">Check Now</button>
-  </div>
-</form>
+</div>
+
+<canvas id="liquid"></canvas>
+
+<canvas id="mountains"></canvas>

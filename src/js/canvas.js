@@ -13,6 +13,23 @@ const gradient = (canvas, color1, color2, x, y, radius) => {
   }
 }
 
+const noise = (canvas, noise) => {
+  noise = noise || randomNoise(createCanvas(canvas.width, canvas.height));
+  // var g = canvas.getContext("2d");
+  g.save();
+  
+  /* Scale random iterations onto the canvas to generate Perlin noise. */
+  for (let size = 4; size <= noise.width; size *= 2) {
+      let x = (Math.random() * (noise.width - size)) | 0
+      let y = (Math.random() * (noise.height - size)) | 0;
+      g.globalAlpha = 4 / size;
+      g.drawImage(noise, x, y, size, size, 0, 0, canvas.width, canvas.height);
+  }
+
+  g.restore();
+  return canvas;
+}
+
 const getAngle = (degree) => degree * Math.PI/360;
 
 const getCordinatesDistance = (x1, y1, x2, y2) => {

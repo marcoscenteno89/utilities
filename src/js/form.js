@@ -23,6 +23,7 @@ export default class Form {
   }
   init() {
     let tabListNode = this.form.querySelectorAll(".tab");
+    let dot = '<span class="dot" >.</span>';
     this.next.setAttribute('data-text', this.next.innerHTML);
     tabListNode.forEach( (tab, i) => {
       let step = false;
@@ -31,10 +32,10 @@ export default class Form {
 
       if (this.stepContainer) {
         let width = `style="flex: 0 1 ${100 / tabListNode.length}%;"`;
-        let step = tabListNode.length > 1 ? `${(i + 1)}.` : '';
+        let step = tabListNode.length > 1 ? `<span class="number">${(i + 1)}</span>${dot}` : '';
         this.stepContainer.insertAdjacentHTML("beforeend", `
           <div ${width} class="step step-${i} flex-col" data-step="${i}">
-            <span class="number">${step}</span>
+            ${step}
             <span class="title">${name.toUpperCase()}</span>
           </div>
         `);
@@ -92,12 +93,8 @@ export default class Form {
         }
       }
     });
-    if (this.tabList[this.currentTab].step) {
-      this.tabList[this.currentTab].step.classList.remove('error');
-    }
 
     if (issues > 0) {
-      console.log(this.tabList[this.currentTab].tab)
       this.tabList[this.currentTab].valid = false;
       if (this.tabList[this.currentTab].step) {
         this.tabList[this.currentTab].step.classList.add('error');
@@ -134,8 +131,11 @@ export default class Form {
 
   clearPreviousTab() {
     if (this.tabList[this.previousTab]) {
-      this.tabList[this.previousTab].step.classList.remove('active');
-      this.tabList[this.previousTab].step.classList.add('completed');
+      if (this.tabList[this.previousTab].step) {
+        this.tabList[this.previousTab].step.classList.remove('error');
+        this.tabList[this.previousTab].step.classList.remove('active');
+        this.tabList[this.previousTab].step.classList.add('completed');
+      }
       this.tabList[this.previousTab].tab.style.display = 'none';
     }
   }
