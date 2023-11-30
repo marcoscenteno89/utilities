@@ -30,17 +30,38 @@ const ajax = (api, callback=false) => {
     console.log(err, api);
   });
 }
-
-const storageAvailable = () => {
-  try {
-    const testKey = 'test';
-    localStorage.setItem(testKey, testKey);
-    localStorage.removeItem(testKey);
-    return true;
-  } catch(e) {
-    console.log('localStorage not available');
-    return false;
+const random = (min=0, max=1, allowZero=true) => {
+  let number = Math.random() * (max - min) + min;
+  if (!allowZero) {
+    while (number > -0.5 && number < 0.5) {
+      number  = Math.random() * (max - min) + min;
+    }
   }
+  return number;
 }
 
-export { exists, ajax, msgError, msgSuccess, storageAvailable }
+class Num extends Number {
+
+  constructor(number) {
+    super(number);
+  }
+
+  decimal(decimalPlaces) {
+    return new Num(this.toFixed(decimalPlaces));
+  }
+
+  additiveInverse() {
+    return new Num(Math.sign(this) === -1 ? Math.abs(this) : this * -1);
+  }
+
+  round() {
+    return new Num(Math.round(this));
+  }
+
+  add(number) {
+    return new Num(this + number);
+  }
+
+}
+
+export { random, exists, ajax, msgError, msgSuccess, Num }

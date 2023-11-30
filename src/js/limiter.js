@@ -1,4 +1,5 @@
-import { msgError, msgSuccess, storageAvailable } from './utilities.js';
+import { msgError, msgSuccess } from './utilities.js';
+// TO-DO Break this class into limiter class and storage class
 export default class Limiter {
   constructor(elem, status) {
     this.target = elem;
@@ -18,7 +19,7 @@ export default class Limiter {
   }
 
   init() {
-    if (storageAvailable()) {
+    if (this.storageAvailable()) {
       let jsonData = localStorage.getItem(`agile_${this.target.getAttribute('data-limit-id')}`);
       if (jsonData) { // USE EXISTING DATA 
         this.dataExists(JSON.parse(jsonData));
@@ -100,4 +101,23 @@ export default class Limiter {
       Limit of uses reached. Try again in ${dayTemp} ${hrTemp} ${minTemp}.
     `);
   }
+
+  storageAvailable = () => {
+    try {
+      const testKey = 'test';
+      localStorage.setItem(testKey, testKey);
+      localStorage.removeItem(testKey);
+      return true;
+    } catch(e) {
+      console.log('localStorage not available');
+      return false;
+    }
+  }
+}
+class Storage {
+  constructor() {
+
+  }
+
+  
 }
