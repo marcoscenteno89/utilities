@@ -16,3 +16,9 @@ canvas {
 .blur-svg {
     display: none;
 }
+#framerate { 
+  width: 50px;
+  padding: 10px;
+  background: #fff;
+  margin-top: 20px;
+}

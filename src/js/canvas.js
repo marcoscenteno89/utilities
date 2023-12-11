@@ -33,16 +33,25 @@ const setColor = (p, colorList, stroke=false, weight=1) => {
   return obj;
 }
 
-const gradient = (ctx, p, mass, pos, colorList, linear=false) => {
+const linearGradient = (ctx, p, start, end, colorList) => {
   try {
-    let gradient;
-    if (linear) {
-      // gradient = ctx.createLinearGradient(0, mass.y, 0, 0);
-      gradient = ctx.createLinearGradient(mass.x * 0.1, 0, mass.x + (mass.x * 0.15), 0);
-    } else  {
-      let radius = mass.x / 2;
-      gradient = ctx.createRadialGradient(pos.x, pos.y, radius / 2, pos.x, pos.y, radius);
+    let gradient = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
+    for (let [i, item] of colorList.entries()) {
+      let mappedVal = parseFloat(p.map(i, 0, colorList.length - 1, 0, 1));
+      let rgba = `rgba(${item.levels[0]}, ${item.levels[1]}, ${item.levels[2]}, ${item.levels[3]})`;
+      gradient.addColorStop(mappedVal, rgba);
     }
+    return gradient;
+  } catch (error) {
+    console.log(colorList, 'start', start, 'end', end);
+    console.log(error);
+  }
+}
+
+const radialGradient = (ctx, p, mass, pos, colorList) => {
+  try {
+    let radius = mass.x / 2;
+    let gradient = ctx.createRadialGradient(pos.x, pos.y, radius / 2, pos.x, pos.y, radius);
     
     for (let [i, item] of colorList.entries()) {
       let mappedVal = parseFloat((i / colorList.length).toFixed(1));
@@ -65,13 +74,68 @@ class CanvasManager {
     this.center = p.createVector(p.width / 2, p.height / 2);
     this.ctx = this.canvas.drawingContext;
     this.background;
+    this.flowfield = {};
     this.force;
     this.objects = [];
   }
+
+  getFieldZone(pos) {
+    let x = this.p.floor(pos.x / this.flowfield.width);
+    let y = this.p.floor(pos.y / this.flowfield.width);
+    return this.flowfield.field[x][y];
+  }
+  
+  updateFlowfield() {
+    this.p.angleMode(this.p.RADIANS);
+    let yoff = 0;
+    for (let x = 0; x < this.flowfield.field.length; x++) {
+      let xoff = 0;
+      for (let y = 0; y < this.flowfield.field[x].length; y++) {
+        let cell = this.flowfield.field[x][y];
+        let angle = this.p.noise(xoff, yoff, this.flowfield.offset) * this.p.TWO_PI * 4;
+        cell.vel.set(this.p5.Vector.fromAngle(angle).setMag(1));
+        xoff += this.flowfield.multiplier;
+      }
+      yoff += this.flowfield.multiplier;
+      this.flowfield.offset += 0.0001;
+    }
+  }
+  
+  drawFlowfield() {
+    for (let x = 0; x < this.flowfield.field.length; x++) {
+      for (let y = 0; y < this.flowfield.field[x].length; y++) {
+        let cell = this.flowfield.field[x][y];
+        this.p.stroke(255);
+        this.p.push();
+        this.p.translate(cell.pos.x, cell.pos.y);
+        this.p.rotate(cell.vel.heading());
+        this.p.line(0, 0, this.flowfield.width / 2, 0)
+        this.p.pop();
+      }
+    }
+  }
+
+  setFlowfield(num, offset, multiplier) {
+    this.flowfield.width = num;
+    this.flowfield.offset = offset;
+    this.flowfield.multiplier = multiplier;
+    this.flowfield.field = [];
+    for (let x = 0; x < this.p.width / num; x++) {
+      let col = []
+      for (let y = 0; y < this.p.height / num; y++) {
+        let mass = this.p.createVector(num, num);
+        let pos = this.p.createVector((x * num) + (num / 2), (y * num) + num / 2);
+        col.push(new Rect(this, pos, false, false, mass, setColor(this.p, ['pink'])));
+      }
+      this.flowfield.field.push(col);
+    }
+  }
   
   bg() {
+    this.p.rectMode(this.p.CORNER);
     this.ctx.fillStyle = this.background;
-    this.p.rect(this.center.x, this.center.y, this.p.width, this.p.height);
+    this.p.rect(0, 0, this.p.width, this.p.height);
+    this.p.rectMode(this.p.CENTER);
   }
 
   applyGradient() {
@@ -110,7 +174,7 @@ class CanvasManager {
 }
 
 class Shape {
-  constructor(canvas, pos, vel, acc=false, mass, color=false, angle=[0], life=false) {
+  constructor(canvas, pos, vel=false, acc=false, mass, color=false, angle=[0], life=false) {
     this.p5 = canvas.p5;
     this.canvas = canvas.canvas;
     this.p = canvas.p;
@@ -118,9 +182,9 @@ class Shape {
     this.ctx = canvas.ctx;
     this.id = this.objects.length + 1;
     this.pos = pos;
-    this.vel = vel;
-    this.acc = acc ? acc : this.p.createVector(0, 0);
     this.mass = mass;
+    this.vel = vel ? vel : this.p.createVector(0, 0);
+    this.acc = acc ? acc : this.p.createVector(0, 0);
     this.color = color;
     this.original = {
       pos: Object.assign({}, pos),
@@ -130,7 +194,7 @@ class Shape {
       color: Object.assign({}, this.color)
     }
 
-    this.p.angleMode(this.p.DEGREES);
+    // this.p.angleMode(this.p.DEGREES);
     this.init(angle, life);
     this.setColor(this.color)
   }
@@ -180,6 +244,7 @@ class Shape {
     let generatedForce = this.p5.Vector.div(force, this.mass.x);
     this.acc.add(generatedForce);
     this.vel.add(this.acc);
+    this.vel.limit(4);
     this.pos.add(this.vel);
     this.acc.set(0, 0);
   }
@@ -205,6 +270,24 @@ class Shape {
     if (x < halfX)                       this.vel.x = -this.vel.x;   // Left
 
     this.pos.add(this.vel);
+  }
+
+  edges() {
+    const halfX = this.mass.x / 2;
+    const halfY = this.mass.y / 2;
+
+    if (this.pos.x > this.p.width - halfX) {
+      this.pos.x = halfX;
+    }
+    if (this.pos.x < halfX) {
+      this.pos.x = this.p.width - halfX;
+    }
+    if (this.pos.y > this.p.height - halfY) {
+      this.pos.y = halfY;
+    }
+    if (this.pos.y < halfY) {
+      this.pos.y = this.p.height - halfY;
+    }
   }
 
   collide(other) {
@@ -252,7 +335,7 @@ class Shape {
 
     if (color.fill.length > 0) {
       if (color.fill.length > 1) {
-        this.ctx.fillStyle = gradient(this.ctx, this.p, this.mass, this.pos, color.fill);
+        this.ctx.fillStyle = radialGradient(this.ctx, this.p, this.mass, this.pos, color.fill);
         this.ctx.fill();
       } else {
         this.p.fill(color.fill[0]);
@@ -421,4 +504,4 @@ class Flame {
   }
 }
 
-export { Ellipse, Rect, Line, canvasObserver, CanvasManager, Triangle, Polygon, Orbit, gradient, setColor }
+export { Ellipse, Rect, Line, canvasObserver, CanvasManager, Triangle, Polygon, Orbit, radialGradient, linearGradient, setColor }
