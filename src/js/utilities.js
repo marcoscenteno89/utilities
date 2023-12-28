@@ -30,38 +30,22 @@ const ajax = (api, callback=false) => {
     console.log(err, api);
   });
 }
-const random = (min=0, max=1, allowZero=true) => {
-  let number = Math.random() * (max - min) + min;
-  if (!allowZero) {
-    while (number > -0.5 && number < 0.5) {
-      number  = Math.random() * (max - min) + min;
-    }
+
+const getRgb = (hex) => {
+  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
   }
-  return number;
 }
 
-class Num extends Number {
-
-  constructor(number) {
-    super(number);
+const getHex = (r, g, b) => {
+  const componentToHex = (current) => {
+      const hex = current.toString(16);
+      return hex.length == 1 ? "0" + hex : hex;
   }
-
-  decimal(decimalPlaces) {
-    return new Num(this.toFixed(decimalPlaces));
-  }
-
-  additiveInverse() {
-    return new Num(Math.sign(this) === -1 ? Math.abs(this) : this * -1);
-  }
-
-  round() {
-    return new Num(Math.round(this));
-  }
-
-  add(number) {
-    return new Num(this + number);
-  }
-
+  return `#${componentToHex(r) + componentToHex(g) + componentToHex(b)}`;
 }
 
-export { random, exists, ajax, msgError, msgSuccess, Num }
+export { random, exists, ajax, msgError, msgSuccess, getRgb, getHex }

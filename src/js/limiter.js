@@ -116,8 +116,36 @@ export default class Limiter {
 }
 class Storage {
   constructor() {
+    this.now = new Date();
+    this.expiration = false;
+    this.obj = {}
+  }
+
+  set() {
 
   }
 
+  get() {
+
+  }
+
+  setExpiration() {
+    this.expiration = new Date();
+    if (this.min > 0) this.expiration.setMinutes( this.now.getMinutes() + this.min );
+    if (this.hr > 0) this.expiration.setHours( this.now.getHours() + this.hr);
+    if (this.day > 0) this.expiration.setHours( this.now.getHours() + (this.day * 24));
+  }
+
+  storageAvailable = () => {
+    try {
+      const testKey = 'test';
+      localStorage.setItem(testKey, testKey);
+      localStorage.removeItem(testKey);
+      return true;
+    } catch(e) {
+      console.log('localStorage not available');
+      return false;
+    }
+  }
   
 }

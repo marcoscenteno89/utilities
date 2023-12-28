@@ -1,6 +1,6 @@
 import Form from './form.js';
 import Limiter from './limiter.js';
-import { canvasObserver, CanvasManager, Rect, Ellipse, Line, Triangle, Polygon, Orbit, linearGradient, setColor } from './canvas.js';
+import { canvasObserver, CanvasManager, Rect, Ellipse, Line, Triangle, Polygon, Orbit, linearGradient, setColor, ranVector } from 'https://cdn.jsdelivr.net/gh/marcoscenteno89/utilities@main/src/js/canvas.js';
 import '../css/form.css';
 import '../css/canvas.css';
 import '../css/global.css';
@@ -152,45 +152,149 @@ let canvas;
     
 //   };
 // });
-let mass;
-let num = 2;
+// let mass;
+// let num = 2;
+// const sketch = new p5((p) => {
+//   p.setup = () => {
+//     canvas = new CanvasManager(p5, p, node);
+//     let bg = setColor(p, [`#2ee7ff`, `#0249b8`]);
+//     canvas.background = linearGradient(
+//       canvas.ctx, p, p.createVector(p.width, p.height), canvas.center, bg.fill, true
+//     );
+//     canvas.setFlowfield(p.floor(p.width * 0.1), 0.1, 2);
+//     p.noiseDetail(1);
+//     canvas.ctx.globalCompositeOperation = "screen";
+//     p.blendMode(p.ADD)
+//     mass = p.createVector(2, 2);
+//     for (let i = 0; i < 100; i++) {
+//       let pos = p.createVector(p.random(mass.x, p.width - mass.x), p.random(mass.y, p.height - mass.y));
+//       canvas.objects.push(new Ellipse(canvas, pos, false, false, mass, setColor(p, ['white'])));
+//     }
+//   };
+//   p.draw = () => {
+//     p.clear();
+//     p.background(0)
+//     canvas.applyGradient();
+//     canvas.updateFlowfield();
+//     // canvas.drawFlowfield();
+//     for (let i = 0; i < num; i++) {
+//       let pos = p.createVector(p.random(mass.x, p.width - mass.x), p.random(mass.y, p.height - mass.y));
+//       canvas.objects.push(new Ellipse(canvas, pos, false, false, mass, setColor(p, ['white'])));
+//     }
+//     for (let i of canvas.objects) {
+//       let zone = canvas.getFieldZone(i.pos);
+//       i.applyForce(zone.vel, 3);
+//       i.edges();
+//       i.draw();
+//     }  
+//     if (canvas.objects.length > 2500) canvas.objects.splice(0, num);
+//     fr.innerHTML = p.floor(p.frameRate());
+//   };
+// });
+
 const sketch = new p5((p) => {
   p.setup = () => {
     canvas = new CanvasManager(p5, p, node);
-    let bg = setColor(p, [
-      `rgb(${parseInt(p.random(0, 255))}, ${parseInt(p.random(0, 255))}, ${parseInt(p.random(0, 255))})`,
-      `rgb(${parseInt(p.random(0, 255))}, ${parseInt(p.random(0, 255))}, ${parseInt(p.random(0, 255))})`
-    ]);
-    canvas.background = linearGradient(canvas.ctx, p, p.createVector(p.width, p.height), canvas.center, bg.fill, true);
-    canvas.setFlowfield(100, 100, 0.2);
-    p.noiseDetail(1);
-    canvas.ctx.globalCompositeOperation = "screen";
-    p.blendMode(p.ADD)
-    mass = p.createVector(2, 2);
-    for (let i = 0; i < 100; i++) {
-      let pos = p.createVector(p.random(mass.x, p.width - mass.x), p.random(mass.y, p.height - mass.y));
-      canvas.objects.push(new Ellipse(canvas, pos, false, false, mass, setColor(p, ['white'])));
+    let color = setColor(p, ['#2ee7ff'], '#2ee7ff');
+    for (let i = 0; i < 20; i++) {
+      let mass = p.createVector(1, 1);
+      let pos = p.createVector(p.random(10, p.width - 10), p.random(10, p.height - 10));
+      let vel = p.createVector(p.random(-1), p.random(1));
+      canvas.objects.push(new Ellipse(canvas, pos, vel, false, mass, color));
     }
   };
   p.draw = () => {
-    p.clear();
-    p.background(0)
-    canvas.applyGradient();
-    canvas.updateFlowfield();
-    // canvas.drawFlowfield();
-    for (let i = 0; i < num; i++) {
-      let pos = p.createVector(p.random(mass.x, p.width - mass.x), p.random(mass.y, p.height - mass.y));
-      canvas.objects.push(new Ellipse(canvas, pos, false, false, mass, setColor(p, ['white'])));
+    let limit = p.width / 3;
+    p.background(0);
+    for (let outer of canvas.objects) {
+      outer.bounceOfBorder();
+      let linesConnected = 0;
+      for (let inner of canvas.objects) {
+        if (outer !== inner) {
+          let dist = p5.Vector.dist(outer.pos, inner.pos);
+          if (dist < limit && dist > 1 ) {
+            linesConnected++;
+            let alpha = p.map(dist, limit, 0, 0, 1);
+            outer.color.fill[0].setAlpha(p.map(alpha, 0, 1, 0, 255))
+            outer.color.weight = alpha;
+            new Line(canvas, outer.pos, inner.pos, false, outer.color);
+          }
+        }
+        let newMass = p.map(linesConnected, 0, canvas.objects.length, 0, 7);
+        outer.mass.set(p.createVector(newMass, newMass));
+        outer.draw();
+      }
     }
-    for (let i of canvas.objects) {
-      let zone = canvas.getFieldZone(i.pos);
-      i.applyForce(zone.vel);
-      i.edges();
-      i.draw();
-    }
-    
-    if (canvas.objects.length > 1000) canvas.objects.splice(0, num);
-    
-    fr.innerHTML = p.floor(p.frameRate());
   };
 });
+
+// const sketch = new p5((p) => {
+//   p.setup = () => {
+//     canvas = new CanvasManager(p5, p, node);
+//     let w = 5;
+//     let color = setColor(p, [`rgba(255, 255, 255, 0.${p.random(1,9).toFixed(0)})`]);
+//     color.stroke = `rgba(255, 255, 255, 0.${p.random(1,9).toFixed(0)})`;
+//     for (let i = 0; i < 200; i++) {
+//       let end = p.createVector(
+//         p.random(canvas.center.x - w, canvas.center.x + w), 
+//         p.random(canvas.center.y - w, canvas.center.y + w)
+//       );
+//       let start = p.createVector(canvas.center.x, canvas.center.y);
+//       let vel = p.random(6, 15);
+//       canvas.objects.push(new Line(canvas, start, end, vel, color, p.random(0.2, 3)));
+//     }
+//   };
+//   p.draw = () => {
+//     p.background(0);
+//     for (let i of canvas.objects) {
+//       let displacement = i.getDisplacement();
+//       let lengthFromCenter = p.dist(i.original.start.x, i.original.start.y, i.end.x, i.end.y);
+//       let length = p.dist(i.start.x, i.start.y, i.end.x, i.end.y);
+//       if (length > canvas.center.x) i.start.sub(displacement);
+//       if (lengthFromCenter > canvas.center.x) {
+//         i.start.set(i.original.start.x, i.original.start.y);
+//         i.end.set(i.original.end.x, i.original.end.y);
+//       }
+//       i.end.sub(displacement);
+//       i.draw();
+//     }
+//   };
+// });
+
+// let count = 0;
+// const sketch = new p5((p) => {
+//   p.setup = () => {
+//     canvas = new CanvasManager(p5, p, node);
+//     canvas.setFlowfield(p.floor(p.width * 0.1), 0.1, 2);
+//     p.noiseDetail(1);
+//     canvas.ctx.globalCompositeOperation = "screen";
+//     p.blendMode(p.ADD)
+//     let color = setColor(p, ['white'], 'white')
+//     for (let i = 0; i < 1; i++) {
+//       let start = p.createVector(0, 0);
+//       let end = p.createVector(p.random(0, 100), p.random(0, 100));
+//       canvas.objects.push(new Line(canvas, start, end, false, color));
+//     }
+//     console.log(canvas.objects)
+//   };
+//   p.draw = () => {
+//     p.clear();
+//     p.background(0)
+//     canvas.applyGradient();
+//     canvas.updateFlowfield();
+//     // canvas.drawFlowfield();
+//     for (let i of canvas.objects) {
+//       let noise = p.noise(i.start.x, i.end.x, count);
+//       // console.log(noise)
+//       // let x = p.map(noise, 0, 1, 1, 10);
+//       // let y = p.map(noise, 0, 1, 1, 10);
+//       let ran = p.random(1, 10);
+//       let vec = p.createVector(i.end.x + noise, i.end.y + noise);
+//       console.log(p.floor(vec.x), p.floor(vec.y))
+//       i.add(vec);
+//       i.draw();
+//     }
+
+//     fr.innerHTML = p.floor(p.frameRate());
+//   };
+// });
